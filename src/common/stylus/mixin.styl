@@ -1,0 +1,62 @@
+// 背景图片
+bg-image($url)
+  background-image: url($url + "@2x.png")
+  @media (-webkit-min-device-pixel-ratio: 3),(min-device-pixel-ratio: 3)
+    background-image: url($url + "@3x.png")
+
+// 不换行
+no-wrap()
+  text-overflow: ellipsis
+  overflow: hidden
+  white-space: nowrap
+
+ellipsis($num)
+  overflow hidden
+  text-overflow ellipsis
+  display -webkit-box
+  -webkit-box-orient vertical
+  -webkit-line-clamp $num
+
+// 扩展点击区域
+extend-click()
+  position: relative
+  &:before
+    content: ''
+    position: absolute
+    top: -10px
+    left: -10px
+    right: -10px
+    bottom: -10px
+
+border-top-1px($color)
+  position: relative
+  &:before
+    display: block
+    position: absolute
+    left: 0
+    top: 0
+    width 100%
+    border-top: 1px solid $color
+    content: ' '
+
+border-bottom-1px($color)
+  position: relative
+  &:after
+    display: block
+    position: absolute
+    left: 0
+    bottom: 0
+    width 100%
+    border-top: 1px solid $color
+    content: ' '
+
+border-none()
+  &:after
+    border-top none
+  &:before
+    border-top none
+
+// $baseFontSize是根据设计稿的尺寸 / 10 来决定的
+$baseFontSize = 75
+px2rem($name, $px)
+  {$name} : ($px / $baseFontSize) * 1 rem
