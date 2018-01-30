@@ -2,7 +2,12 @@
   <div class="appiontment-wrapper">
     <appiontment-title></appiontment-title>
     <white-line></white-line>
-    <user-form></user-form>
+    <user-form :formTitle="formTitle"
+               :formType="formType"
+    ></user-form>
+    <div class="submit-btn">
+      预约提交
+    </div>
   </div>
 </template>
 
@@ -15,6 +20,12 @@
 
   Vue.use(AlertPlugin)
   export default {
+    data() {
+      return {
+        formType: true,
+        formTitle: '预约信息提交（必填）'
+      }
+    },
     mounted() {
     },
     components: {
@@ -27,25 +38,17 @@
 
 <style lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/index.styl"
+  @import "~common/css/initform.styl"
+  .appiontment-wrapper
+    background-color #f0f5f5
 
-  .weui-cells, .vux-no-group-title
-    margin-top 0 !important
-    font-size 14px !important
-    color #6f778c
+  .submit-btn
+    width 100%
+    height 40px
+    line-height 40px
+    text-align center
+    background-color #5bbfd3
+    color #ffffff
+    margin 50px 0 0
 
-  .vux-datetime
-    color #6f778c !important
-
-  .weui-cells
-    &:after
-      border-bottom none !important
-
-  .vux-cell-value
-    color #333741 !important
-
-  .weui-input
-    color #333741 !important
-
-  .dp-header, .dp-item.dp-right, .vux-popup-header-right
-    color #5bbfd3 !important
 </style>

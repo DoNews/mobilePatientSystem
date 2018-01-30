@@ -171,9 +171,16 @@ var config = {
     noInfo: false,
     proxy: {
       '/api': {
-        target: 'http://lightpower.yuemia.com',
+        target: 'http://huiling.wx.yuemia.com',
+        changeOrigin: true,
+        secure: false
+        // pathRewrite: {'^/api': ''}
+      },
+      '/static': {
+        target: 'http://huiling.wx.yuemia.com',
         changeOrigin: true,
         // secure: false
+        // pathRewrite: {'^/api': ''}
       }
     }
   },

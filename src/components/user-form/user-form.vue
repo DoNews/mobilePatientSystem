@@ -2,39 +2,91 @@
   <div class="form-wrapper">
     <div class="title">
       <i class="icon"></i>
-      <span class="text">预约信息</span>
+      <span class="text">{{formTitle}}</span>
     </div>
     <div class="wrapper">
       <group>
-        <x-input title="患者姓名" placeholder="请输入患者姓名" text-align="right" v-model="userInfo.name"></x-input>
+        <x-input title="患者姓名" placeholder="请输入患者姓名" text-align="right" v-model="userInfo.name" :readonly="!formType"></x-input>
       </group>
       <group>
-        <datetime :min-year="1900" v-model="userInfo.birthday" @on-change="birthdayChange" title="出生日期" placeholder="请选择出生日期"></datetime>
+        <datetime :min-year="1900" v-model="userInfo.birthday" @on-change="birthdayChange" title="出生日期"
+                  placeholder="请选择出生日期" :readonly="!formType"></datetime>
       </group>
       <group>
-        <popup-picker title="患者性别" :data='gender' v-model='userInfo.gender' @on-change='genderChange' placeholder="请选择患者性别"></popup-picker>
+        <popup-picker title="患者性别" :data='gender' v-model='userInfo.gender' @on-change='genderChange'
+                      placeholder="请选择患者性别" v-if="formType"></popup-picker>
+        <div class="option" v-if="!formType">
+          <div class="option-name">患者性别</div>
+          <div class="context">{{userInfo.gender[0]}}</div>
+        </div>
       </group>
       <group>
-        <x-input title="患者手机" placeholder="请输入患者手机" text-align="right" v-model="userInfo.telephone"></x-input>
+        <x-input title="患者手机" placeholder="请输入患者手机" text-align="right" v-model="userInfo.telephone" :readonly="!formType"></x-input>
       </group>
       <group>
-        <popup-picker title="所属区域" :data='arealist' v-model='userInfo.area' @on-change='areaChange' placeholder="请选择所属区域"></popup-picker>
+        <popup-picker title="所属区域" :data='arealist' v-model='userInfo.area' @on-change='areaChange'
+                      placeholder="请选择所属区域" v-if="formType"></popup-picker>
+        <div class="option" v-if="!formType">
+          <div class="option-name">所属区域</div>
+          <div class="context">{{userInfo.area[0]}}</div>
+        </div>
       </group>
       <group>
-        <datetime v-model="userInfo.app_time" @on-change="AppTimeChange" title="期望预约时间" placeholder="请选择期望预约时间"></datetime>
+        <datetime v-model="userInfo.app_time" @on-change="AppTimeChange" title="期望预约时间"
+                  placeholder="请选择期望预约时间" :readonly="!formType"></datetime>
       </group>
       <group>
-        <popup-picker title="预约医院" :data='hostlist' v-model='userInfo.host' @on-change='hostChange' placeholder="请选择预约医院"></popup-picker>
+        <popup-picker title="预约医院" :data='hostlist' v-model='userInfo.host' @on-change='hostChange'
+                      placeholder="请选择预约医院" v-if="formType"></popup-picker>
+        <div class="option" v-if="!formType">
+          <div class="option-name">预约医院</div>
+          <div class="context">{{userInfo.host[0]}}</div>
+        </div>
       </group>
-      <div class="option"></div>
+      <group title="胎记治疗及胎记描述">
+        <x-textarea placeholder="请输入具体描述" v-model="userInfo.desc" :height="130" :readonly="!formType"></x-textarea>
+      </group>
+      <group :title="uploadImgTitle">
+        <div class="imgItem" v-show="imgSrcList.length>0" v-for="(imgSrc,index) in imgSrcList" :key="index"
+             :style="bgStyle(imgSrc)">
+          <i class="icon-chahao" @click="delOne(index)" v-if="formType"></i>
+        </div>
+        <div class="file" v-if="formType">
+          <input type="file" class="myfile" ref="file" @change="getFileUrl($event)">
+        </div>
+      </group>
     </div>
   </div>
 </template>
 
 <script type='text/ecmascript-6'>
-  import {XInput, Group, Datetime, PopupPicker} from 'vux'
+  import Vue from 'vue'
+  import {XInput, Group, Datetime, PopupPicker, XTextarea, AlertPlugin, LoadingPlugin} from 'vux'
+  import axios from 'axios'
 
+  Vue.use(AlertPlugin)
+  Vue.use(LoadingPlugin)
   export default {
+    props: {
+      formTitle: {
+        type: String,
+        default: ''
+      },
+      uploadImgTitle: {
+        type: String,
+        default: '胎记照片上传（单张照片大小在20M以内）'
+      },
+      formType: {
+        type: Boolean,
+        default: ''
+      },
+      info: {
+        type: Object,
+        default: () => {
+          return {}
+        }
+      }
+    },
     data() {
       return {
         gender: [['男', '女']],
@@ -56,8 +108,10 @@
           telephone: '',
           area: [],
           app_time: '',
-          host: []
-        }
+          host: [],
+          desc: ''
+        },
+        imgSrcList: []
       }
     },
     methods: {
@@ -70,13 +124,60 @@
       AppTimeChange() {
       },
       hostChange() {
+      },
+      bgStyle(imgUrl) {
+        if (!imgUrl) {
+          return ''
+        } else {
+          return `background-image: url(${imgUrl})`
+        }
+      },
+      getFileUrl($event) {
+        let fileDoc = $event.target.files[0]
+        if (!fileDoc) {
+          return false
+        }
+        // console.log(fileDoc)
+        let size = Math.floor(fileDoc.size / 1024)
+        if (size > 20000) {
+          this.$vux.alert.show({
+            content: '上传图片不能高于20M，请重新选择!'
+          })
+          return false
+        }
+        let formData = new FormData()
+        formData.append('img', fileDoc)
+        this.$vux.loading.show({
+          text: '上传中...'
+        })
+        axios.post('/api/hui/uploader/', formData).then((rsp) => {
+          // console.log(rsp)
+          this.$vux.loading.hide()
+          if (rsp.data.result === 0) {
+            this.imgSrcList.push(rsp.data.imgurl)
+          } else {
+            this.$vux.alert.show({
+              content: '上传图片失败，请重新上传!'
+            })
+          }
+        }).catch(e => {
+          console.log(e)
+        })
+      },
+      delOne(index) {
+        this.imgSrcList.splice(index, 1)
+      }
+    },
+    watch: {
+      info() {
       }
     },
     components: {
       XInput,
       Group,
       Datetime,
-      PopupPicker
+      PopupPicker,
+      XTextarea
     }
   }
 </script>
@@ -84,6 +185,7 @@
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   .form-wrapper
     padding 0 18px 10px
+    background-color #ffffff
     .title
       height 50px
       line-height 50px
@@ -91,9 +193,65 @@
       color #6f778c
       i
         display inline-block
-        width 24px
-        height 24px
+        width 20px
+        height 20px
         background url("./img/form.png") no-repeat
         background-size 100% 100%
         vertical-align middle
+        position relative
+        top -2px
+    .wrapper
+      .option
+        display flex
+        padding 10px 0
+        .option-name
+          flex 0 0 5em
+          width 5em
+        .context
+          flex 1
+          text-align right
+      .imgItem
+        width 65px
+        height 65px
+        display inline-block
+        overflow hidden
+        text-align center
+        position relative
+        margin 9px
+        vertical-align bottom
+        background-size cover
+        background-position 50% 50%
+        border-radius 3px
+        .icon-chahao
+          display inline-block
+          right 0
+          top 0
+          width 20px
+          height 20px
+          background url("./img/chahao.png") no-repeat
+          background-size 100% 100%
+          extend-click()
+          position absolute
+      .file
+        width 65px
+        height 65px
+        display inline-block
+        background url("./img/selected.png") no-repeat
+        background-size 100% 100%
+        margin 9px
+        position relative
+        -left -4px
+        vertical-align bottom
+        .myfile
+          border: none !important
+          height 100%
+          width 100%
+          outline none
+          opacity: 0
+          &::-webkit-file-upload-button
+            width: 10px
+            height: 10px
+            position: absolute
+            outline: 0
+            opacity: 0
 </style>

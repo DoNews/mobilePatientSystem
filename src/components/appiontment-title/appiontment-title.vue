@@ -1,10 +1,6 @@
 <template>
   <div class="title-wrapper">
-    <div class="title">
-      <span class="text">
-        红胎记治疗门诊预约
-      </span>
-    </div>
+    <my-title :title="title"></my-title>
     <white-line></white-line>
     <div class="tip">
       <div class="left">
@@ -21,25 +17,24 @@
 
 <script type='text/ecmascript-6'>
   import WhiteLine from 'components/Line/Line'
+  import MyTitle from 'components/title/title'
 
   export default {
+    data() {
+      return {
+        title: '红胎记治疗门诊预约'
+      }
+    },
     components: {
-      WhiteLine
+      WhiteLine,
+      MyTitle
     }
   }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   .title-wrapper
-    .title
-      background-color #e5f3ff
-      line-height 40px
-      height 40px
-      text-align center
-      .text
-        color #2c899b
-        font-size 16px
-        font-weight 500
+    background-color #fff
     .tip
       height 100px
       padding 10px
@@ -53,8 +48,8 @@
         padding-top 10px
         i
           display inline-block
-          width 24px
-          height 24px
+          width 20px
+          height 20px
           background url("./img/tip.png") no-repeat
           background-size 100% 100%
         span
