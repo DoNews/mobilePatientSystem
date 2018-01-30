@@ -17,43 +17,30 @@
   import MyTitle from 'components/title/title'
   import WhiteLine from 'components/Line/Line'
   import Patient from 'components/patient/patient'
+  import {getPatientList} from 'common/service/server'
 
   export default {
     data() {
       return {
-        patientList: [
-          {
-            id: 1,
-            name: '张三丰',
-            wantHospital: '我的意愿',
-            sex: '女',
-            time: '2018-2-6'
-          },
-          {
-            id: 2,
-            name: '张三丰',
-            wantHospital: '我的意愿',
-            sex: '男',
-            time: '2018-2-6'
-          },
-          {
-            id: 3,
-            name: '张三丰',
-            wantHospital: '我的意愿',
-            sex: '女',
-            time: '2018-2-6'
-          },
-          {
-            id: 4,
-            name: '张三丰',
-            wantHospital: '我的意愿',
-            sex: '女',
-            time: '2018-2-6'
-          }
-        ]
+        patientList: []
       }
     },
+    created() {
+      this.getPatientList()
+    },
     methods: {
+      getPatientList() {
+        let params = {
+          // openid: localStorage.getItem('openid')
+          openid: 'o_MHBjuPu3dDh2-1z5rPfmXNfsAQ'
+        }
+        getPatientList(params).then(rsp => {
+          // console.log(rsp)
+          if (rsp.data.ret === 0) {
+            this.patientList = rsp.data.lister
+          }
+        })
+      },
       editorPatient(patient) {
         console.log(patient)
       },

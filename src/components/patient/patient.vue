@@ -6,7 +6,7 @@
     </div>
     <div class="option">
       <div class="option-name">预约医院:</div>
-      <div class="context" v-text="patient.wantHospital"></div>
+      <div class="context" v-text="patient.hospital"></div>
     </div>
     <div class="option">
       <div class="option-name">性别:</div>
@@ -14,7 +14,7 @@
     </div>
     <div class="option">
       <div class="option-name">就诊时间:</div>
-      <div class="context" v-text="patient.time"></div>
+      <div class="context" v-text="patient.wantTime"></div>
     </div>
     <div class="operate">
       <i class="icon editor" @click.stop="editor(patient)"></i>

@@ -171,13 +171,13 @@ var config = {
     noInfo: false,
     proxy: {
       '/api': {
-        target: 'http://huiling.wx.yuemia.com',
+        target: 'http://order.yuemia.com',
         changeOrigin: true,
         secure: false
         // pathRewrite: {'^/api': ''}
       },
       '/static': {
-        target: 'http://huiling.wx.yuemia.com',
+        target: 'http://order.yuemia.com',
         changeOrigin: true,
         // secure: false
         // pathRewrite: {'^/api': ''}

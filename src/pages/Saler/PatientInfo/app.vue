@@ -12,8 +12,9 @@
         <x-textarea placeholder="请输入客服电话确认记录" v-model="item.text" :height="130" :readonly="true"></x-textarea>
         <div class="customservice">
           <span>责任客服:{{item.customservice}}</span>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <span>{{item.time}}</span>
         </div>
       </group>
@@ -31,6 +32,7 @@
   import UserForm from 'components/user-form/user-form'
   import MyTitle from 'components/title/title'
   import WhiteLine from 'components/Line/Line'
+  import {getPatientDetail} from 'common/service/server'
 
   Vue.use(AlertPlugin)
   export default {
@@ -56,7 +58,15 @@
         ]
       }
     },
+    created() {
+      this.getPatientDetail()
+    },
     methods: {
+      getPatientDetail() {
+        getPatientDetail().then(rsp => {
+          console.log(rsp)
+        })
+      },
       closePage() {
       },
       write() {

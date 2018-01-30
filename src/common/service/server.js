@@ -1,19 +1,11 @@
 import {get, post} from './http.base'
 
-export function getSolutionDetail(params) {
-  return get('/api/smfly/solveplan/', params)
+export function getPatientList(params) {
+  return get('/api/apoint/mypatien/', params)
 }
 
-export function getProductIndex(params) {
-  return get('/api/smfly/productcenter/', params)
-}
-
-export function getProductList(params) {
-  return get('/api/smfly/productline/', params)
-}
-
-export function getProductDetail(params) {
-  return get('/api/smfly/detailspage/', params)
+export function getPatientDetail(params) {
+  return get('/api/apoint/patientsdetail/', params)
 }
 
 export function getSmfDetail(params) {
