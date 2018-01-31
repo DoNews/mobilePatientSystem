@@ -33,7 +33,7 @@ const devPort = 7290
 var config = {
   entry: entries,
   output: {
-    path: resolve(__dirname, './dist'),
+    path: resolve(__dirname, './MobileClient'),
     filename: 'assets/js/[name].js',
     publicPath: debug ? '/' : '../'
   },
