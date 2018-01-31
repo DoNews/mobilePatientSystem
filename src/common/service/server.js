@@ -8,22 +8,18 @@ export function getPatientDetail(params) {
   return get('/api/apoint/patientsdetail/', params)
 }
 
-export function getSmfDetail(params) {
-  return get('/api/smfly/shier/', params)
+export function getProvinceList(params) {
+  return get('/api/apoint/province/', params)
 }
 
-export function getHistoryMsgList(params) {
-  return get('/api/smfly/message/', params)
+export function getHospitalList(params) {
+  return get('/api/apoint/hospital/', params)
 }
 
-export function getQuestionnaireList(params) {
-  return get('/api/smfly/surver/', params)
+export function submitTreat(params) {
+  return post('/api/apoint/thememo/', params)
 }
 
-export function getQuestionnaireDetail(params) {
-  return get('/api/smfly/details/', params)
-}
-
-export function submitQuestionnaire(params) {
-  return post('/api/smfly/questionsubmit/', params)
+export function submitAppiont(params) {
+  return post('/api/apoint/ordersubmit/', params)
 }

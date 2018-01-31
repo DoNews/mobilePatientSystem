@@ -6,45 +6,48 @@
     </div>
     <div class="wrapper">
       <group>
-        <x-input title="患者姓名" placeholder="请输入患者姓名" text-align="right" v-model="userInfo.name" :readonly="!formType"></x-input>
+        <x-input required title="患者姓名" placeholder="请输入患者姓名" text-align="right" v-model="userInfo.name"
+                 :readonly="!formType"></x-input>
       </group>
       <group>
         <datetime :min-year="1900" v-model="userInfo.birthday" @on-change="birthdayChange" title="出生日期"
                   placeholder="请选择出生日期" :readonly="!formType"></datetime>
       </group>
       <group>
-        <popup-picker title="患者性别" :data='gender' v-model='userInfo.gender' @on-change='genderChange'
+        <popup-picker title="患者性别" :data='gender' v-model='sex' @on-change='genderChange'
                       placeholder="请选择患者性别" v-if="formType"></popup-picker>
         <div class="option" v-if="!formType">
           <div class="option-name">患者性别</div>
-          <div class="context">{{userInfo.gender[0]}}</div>
+          <div class="context">{{userInfo.sex}}</div>
         </div>
       </group>
       <group>
-        <x-input title="患者手机" placeholder="请输入患者手机" text-align="right" v-model="userInfo.telephone" :readonly="!formType"></x-input>
+        <x-input title="患者手机" required type="tel" placeholder="请输入患者手机" text-align="right" v-model="userInfo.phone"
+                 :readonly="!formType"></x-input>
       </group>
       <group>
-        <popup-picker title="所属区域" :data='arealist' v-model='userInfo.area' @on-change='areaChange'
+        <popup-picker title="所属区域" :data='arealist' v-model='area' @on-change='areaChange'
                       placeholder="请选择所属区域" v-if="formType"></popup-picker>
         <div class="option" v-if="!formType">
           <div class="option-name">所属区域</div>
-          <div class="context">{{userInfo.area[0]}}</div>
+          <div class="context">{{userInfo.area}}</div>
         </div>
       </group>
       <group>
-        <datetime v-model="userInfo.app_time" @on-change="AppTimeChange" title="期望预约时间"
+        <datetime v-model="userInfo.wantTime" @on-change="AppTimeChange" title="期望预约时间"
                   placeholder="请选择期望预约时间" :readonly="!formType"></datetime>
       </group>
       <group>
-        <popup-picker title="预约医院" :data='hostlist' v-model='userInfo.host' @on-change='hostChange'
+        <popup-picker title="预约医院" :data='hostlist' v-model='host' @on-change='hostChange'
                       placeholder="请选择预约医院" v-if="formType"></popup-picker>
         <div class="option" v-if="!formType">
           <div class="option-name">预约医院</div>
-          <div class="context">{{userInfo.host[0]}}</div>
+          <div class="context">{{userInfo.wanthospital}}</div>
         </div>
       </group>
       <group title="胎记治疗及胎记描述">
-        <x-textarea placeholder="请输入具体描述" v-model="userInfo.desc" :height="130" :readonly="!formType"></x-textarea>
+        <x-textarea placeholder="请输入具体描述" v-model="userInfo.description" :height="130"
+                    :readonly="!formType"></x-textarea>
       </group>
       <group :title="uploadImgTitle">
         <div class="imgItem" v-show="imgSrcList.length>0" v-for="(imgSrc,index) in imgSrcList" :key="index"
@@ -85,13 +88,25 @@
         default: () => {
           return {}
         }
+      },
+      arealist: {
+        type: Array,
+        default: () => {
+          return []
+        }
+      },
+      hostlist: {
+        type: Array,
+        default: () => {
+          return []
+        }
       }
     },
     data() {
       return {
         gender: [['男', '女']],
-        arealist: [['上海', '北京']],
-        hostlist: [['上海中山医院', '协和医院']],
+        // arealist: [['上海', '北京']],
+        // hostlist: [['上海中山医院', '协和医院']],
         /* userInfo: {
           name: '',
           birthday: '2017-12-11',
@@ -101,15 +116,18 @@
           app_time: '2017-12-21',
           host: ['上海中山医院']
         }, */
+        sex: [],
+        area: [],
+        host: [],
         userInfo: {
           name: '',
           birthday: '',
-          gender: [],
-          telephone: '',
-          area: [],
-          app_time: '',
-          host: [],
-          desc: ''
+          sex: '',
+          phone: '',
+          area: '',
+          wantTime: '',
+          wanthospital: '',
+          description: ''
         },
         imgSrcList: []
       }
@@ -118,12 +136,25 @@
       birthdayChange() {
       },
       genderChange() {
+        this.userInfo.sex = this.sex[0]
       },
       areaChange() {
+        // 提交的时候 要ID
+        let aIndex = this.findId(this.arealist, this.area[0])
+        this.userInfo.area = this.arealist[0][aIndex].id
       },
       AppTimeChange() {
+        // console.log(this.userInfo.wantTime)
       },
       hostChange() {
+        // 提交的时候 要ID
+        let aIndex = this.findId(this.hostlist, this.host[0])
+        this.userInfo.wanthospital = this.hostlist[0][aIndex].id
+      },
+      findId(arr, el) {
+        return arr[0].findIndex((item) => {
+          return item.value === el
+        })
       },
       bgStyle(imgUrl) {
         if (!imgUrl) {
@@ -150,7 +181,7 @@
         this.$vux.loading.show({
           text: '上传中...'
         })
-        axios.post('/api/hui/uploader/', formData).then((rsp) => {
+        axios.post('/api/apoint/upload/', formData).then((rsp) => {
           // console.log(rsp)
           this.$vux.loading.hide()
           if (rsp.data.result === 0) {
@@ -166,10 +197,16 @@
       },
       delOne(index) {
         this.imgSrcList.splice(index, 1)
+      },
+      submitInfo() {
+        this.userInfo.openid = localStorage.getItem('openid') !== 'undefined' ? localStorage.getItem('openid') : ''
+        this.$emit('userInfo', this.userInfo, this.imgSrcList)
       }
     },
     watch: {
       info() {
+        this.userInfo = this.info
+        this.imgSrcList = this.info.photo
       }
     },
     components: {

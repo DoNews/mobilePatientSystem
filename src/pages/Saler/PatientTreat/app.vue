@@ -17,7 +17,7 @@
     </div>
     <div class="btn">
       <div class="cancel" @click="cancel">取消</div>
-      <div class="submit" @click="submit">提交</div>
+      <div class="submit" @click="submitTreat">提交</div>
     </div>
   </div>
 </template>
@@ -27,8 +27,17 @@
   import {AlertPlugin, XInput, Group, XTextarea, PopupPicker} from 'vux' // 引用vux使用单引号
   import MyTitle from 'components/title/title'
   import WhiteLine from 'components/Line/Line'
+  import {submitTreat, getPatientDetail} from 'common/service/server'
+  import {urlSearch} from 'common/js/util'
 
   Vue.use(AlertPlugin)
+  const statusSwitch = {
+    '已安排治疗': 6,
+    '预约延后治疗': 11,
+    '转院': 13,
+    '患者未到诊': 14,
+    '暂停跟进': 12
+  }
   export default {
     data() {
       return {
@@ -38,12 +47,51 @@
         statuslist: [['已安排治疗', '预约延后治疗', '转院', '患者未到诊', '暂停跟进']]
       }
     },
+    created() {
+      this.request = urlSearch(window.location.href)
+      this.getPatientDetail()
+    },
     methods: {
-      statusChange() {
+      submitTreat() {
+        if (!this.desc || !this.status.length) {
+          this.$vux.alert.show({
+            content: '请填写完整备忘信息，再提交!'
+          })
+          return false
+        }
+        let params = {
+          id: this.request.id,
+          openid: localStorage.getItem('openid'),
+          describe: this.desc,
+          types: statusSwitch[this.status[0]]
+        }
+        submitTreat(params).then(rsp => {
+          if (rsp.data.ret === 0) {
+            this.$vux.alert.show({
+              content: '您的备忘已经提交成功,可在患者信息详情查看！',
+              onHide() {
+                // 回到上一级的话 如果是在详情点击进去的，获取之后 不会刷新，新添加的备忘不会显示
+                // window.history.back(-1)
+                window.location.href = './MyPatient.html'
+              }
+            })
+          }
+        })
+      },
+      getPatientDetail() {
+        let params = {
+          id: this.request.id
+        }
+        getPatientDetail(params).then(rsp => {
+          if (rsp.data.ret === 0) {
+            this.name = rsp.data.data.name
+          }
+        })
+      },
+      statusChange(val) {
       },
       cancel() {
-      },
-      submit() {
+        window.history.back(-1)
       }
     },
     components: {

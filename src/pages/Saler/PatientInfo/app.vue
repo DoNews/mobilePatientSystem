@@ -8,10 +8,10 @@
                :info="info"
     ></user-form>
     <div class="desclist">
-      <group title="客服电话确认记录" v-for="(item,index) in descList" :key="index">
-        <x-textarea placeholder="请输入客服电话确认记录" v-model="item.text" :height="130" :readonly="true"></x-textarea>
+      <group title="跟进记录" v-for="(item,index) in descList" :key="index">
+        <x-textarea placeholder="暂无记录" v-model="item.remark" :height="130" :readonly="true"></x-textarea>
         <div class="customservice">
-          <span>责任客服:{{item.customservice}}</span>
+          <span>提交人:{{item.name}}</span>
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -27,14 +27,13 @@
 </template>
 
 <script type='text/ecmascript-6'>
-  import Vue from 'vue'
-  import {AlertPlugin, XTextarea, Group} from 'vux' // 引用vux使用单引号
+  import {XTextarea, Group} from 'vux' // 引用vux使用单引号
   import UserForm from 'components/user-form/user-form'
   import MyTitle from 'components/title/title'
   import WhiteLine from 'components/Line/Line'
   import {getPatientDetail} from 'common/service/server'
+  import {urlSearch} from 'common/js/util'
 
-  Vue.use(AlertPlugin)
   export default {
     data() {
       return {
@@ -42,34 +41,32 @@
         formTitle: '预约信息',
         uploadImgTitle: '胎记照片',
         info: {},
-        descList: [
-          {
-            id: 1,
-            text: '2312312312313213123',
-            customservice: '复小丹',
-            time: '2017-12-15 14:05'
-          },
-          {
-            id: 2,
-            text: '2312312312331231231231213213123',
-            customservice: '复小丹',
-            time: '2017-12-15 14:05'
-          }
-        ]
+        descList: []
       }
     },
     created() {
-      this.getPatientDetail()
+      this.request = urlSearch(window.location.href)
+      this.getPatientDetail(this.request.id)
     },
     methods: {
-      getPatientDetail() {
-        getPatientDetail().then(rsp => {
-          console.log(rsp)
+      getPatientDetail(id) {
+        let params = {
+          id: id
+        }
+        getPatientDetail(params).then(rsp => {
+          if (rsp.data.ret === 0) {
+            this.info = rsp.data.data
+            this.descList = rsp.data.customer
+          }
+        }).catch(e => {
+          console.log(e)
         })
       },
       closePage() {
+        window.location.href = './MyPatient.html'
       },
       write() {
+        window.location.href = `./PatientTreat.html?id=${this.request.id}`
       }
     },
     components: {
