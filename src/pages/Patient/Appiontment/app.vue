@@ -57,6 +57,12 @@
           })
           return false
         }
+        if (!this.checkTel(this.userInfo.phone)) {
+          this.$vux.alert.show({
+            content: '请填写正确的手机号码!'
+          })
+          return false
+        }
         let params = {
           userinfo: JSON.stringify(this.userInfo),
           photo: JSON.stringify(this.photo)

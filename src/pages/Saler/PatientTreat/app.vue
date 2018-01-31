@@ -118,7 +118,7 @@
 
   .btn
     display flex
-    font-size 18px
+    font-size 16px
     text-align center
     height 40px
     line-height 40px
