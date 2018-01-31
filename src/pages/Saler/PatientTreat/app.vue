@@ -29,6 +29,7 @@
   import WhiteLine from 'components/Line/Line'
   import {submitTreat, getPatientDetail} from 'common/service/server'
   import {urlSearch} from 'common/js/util'
+  import {hideMenus} from 'common/js/mixin'
 
   Vue.use(AlertPlugin)
   const statusSwitch = {
@@ -39,6 +40,7 @@
     '暂停跟进': 12
   }
   export default {
+    mixins: [hideMenus],
     data() {
       return {
         name: '',

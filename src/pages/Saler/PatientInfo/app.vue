@@ -33,8 +33,10 @@
   import WhiteLine from 'components/Line/Line'
   import {getPatientDetail} from 'common/service/server'
   import {urlSearch} from 'common/js/util'
+  import {hideMenus} from 'common/js/mixin'
 
   export default {
+    mixins: [hideMenus],
     data() {
       return {
         formType: false,
