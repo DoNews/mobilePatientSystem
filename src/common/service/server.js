@@ -23,3 +23,11 @@ export function submitTreat(params) {
 export function submitAppiont(params) {
   return post('/api/apoint/ordersubmit/', params)
 }
+
+export function submitAuthInfo(params) {
+  return post('/api/apoint/staff/', params)
+}
+
+export function submitSendCode(params) {
+  return post('/api/apoint/scrfcode/', params)
+}
