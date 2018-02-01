@@ -23,11 +23,11 @@
   import WhiteLine from 'components/Line/Line'
   import {getProvinceList, getHospitalList, submitAppiont} from 'common/service/server'
   import {urlSearch} from 'common/js/util'
-  import {checkForm} from 'common/js/mixin'
+  import {checkForm, hideMenus} from 'common/js/mixin'
 
   Vue.use(AlertPlugin)
   export default {
-    mixins: [checkForm],
+    mixins: [checkForm, hideMenus],
     data() {
       return {
         formType: true,
