@@ -15,6 +15,8 @@
 </template>
 
 <script type='text/ecmascript-6'>
+  import Vue from 'vue'
+  import {AlertPlugin} from 'vux' // 引用vux使用单引号
   import MyTitle from 'components/title/title'
   import WhiteLine from 'components/Line/Line'
   import Patient from 'components/patient/patient'
@@ -23,6 +25,7 @@
   import {urlSearch} from 'common/js/util'
   import {hideMenus} from 'common/js/mixin'
 
+  Vue.use(AlertPlugin)
   export default {
     mixins: [hideMenus],
     data() {
@@ -46,6 +49,10 @@
         getPatientList(params).then(rsp => {
           if (rsp.data.ret === 0) {
             this.patientList = rsp.data.lister
+          } else {
+            this.$vux.alert.show({
+              content: '没有相关内容,可能您未认证。如果您已认证,请联系管理员！'
+            })
           }
         })
       },
@@ -67,7 +74,7 @@
 
 <style lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/index.styl"
-  
+
   html, body
     height 100%
     background-color #eef5f5
