@@ -23,7 +23,7 @@
       </group>
       <group>
         <x-input title="患者手机" required type="tel" placeholder="请输入患者手机" text-align="right" v-model="userInfo.phone"
-                 :readonly="!formType"></x-input>
+                 :readonly="!formType" @on-blur="telBlur"></x-input>
       </group>
       <group>
         <popup-picker title="所属区域" :data='arealist' v-model='area' @on-change='areaChange'
@@ -133,6 +133,9 @@
       }
     },
     methods: {
+      telBlur(val, $event) {
+        this.$emit('telandname', val, this.userInfo.name ? this.userInfo.name : '')
+      },
       birthdayChange() {
       },
       genderChange() {

@@ -7,6 +7,7 @@
                :arealist="arealist"
                :hostlist="hostlist"
                @userInfo="getUserInfo"
+               @telandname="telcheck"
                ref="userForm"
     ></user-form>
     <div class="submit-btn" @click="submitApp">
@@ -21,7 +22,7 @@
   import AppiontmentTitle from 'components/appiontment-title/appiontment-title'
   import UserForm from 'components/user-form/user-form'
   import WhiteLine from 'components/Line/Line'
-  import {getProvinceList, getHospitalList, submitAppiont} from 'common/service/server'
+  import {getProvinceList, getHospitalList, submitAppiont, checkTelAndName} from 'common/service/server'
   import {urlSearch} from 'common/js/util'
   import {checkForm, hideMenus} from 'common/js/mixin'
 
@@ -47,6 +48,27 @@
       this.getHospitalList()
     },
     methods: {
+      telcheck(tel, name) {
+        // console.log(tel)
+        // console.log(name)
+        if (!this.checkTel(tel)) {
+          this.$vux.alert.show({
+            content: '请填写正确的手机号码!'
+          })
+          return false
+        }
+        let params = {
+          phone: tel
+        }
+        checkTelAndName(params).then(rsp => {
+          // console.log(rsp)
+          if (rsp.data.ret !== 0) {
+            this.$vux.alert.show({
+              content: '您有预约正在流程中，无需再次预约!'
+            })
+          }
+        })
+      },
       submitApp() {
         this.$refs.userForm.submitInfo()
         let userInfoFlag = this._checkEmpty(this.userInfo)
@@ -73,7 +95,7 @@
             window.location.href = './AppiontmentSuccess.html'
           } else if (rsp.data.ret === 1) {
             this.$vux.alert.show({
-              content: '您已预约过，无需再次预约!'
+              content: '您有预约正在流程中，无需再次预约!'
             })
           }
         }).catch(e => {

@@ -31,3 +31,7 @@ export function submitAuthInfo(params) {
 export function submitSendCode(params) {
   return post('/api/apoint/scrfcode/', params)
 }
+
+export function checkTelAndName(params) {
+  return get('/api/apoint/checkphone/', params)
+}

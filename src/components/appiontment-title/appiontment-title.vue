@@ -57,6 +57,8 @@
           display inline-block
           padding 0 5px
           width 100%
+          position relative
+          left -3px
       .right
         flex 1
         display flex

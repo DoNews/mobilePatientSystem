@@ -11,8 +11,8 @@
         <popup-picker title="治疗状态" :data='statuslist' v-model='status' @on-change='statusChange'
                       placeholder="请选择治疗状态"></popup-picker>
       </group>
-      <group title="胎记治疗及胎记描述">
-        <x-textarea placeholder="请输入具体描述" v-model="desc" :height="130"></x-textarea>
+      <group title="填写备注">
+        <x-textarea placeholder="请输入具体备注" v-model="desc" :height="130"></x-textarea>
       </group>
     </div>
     <div class="btn">
