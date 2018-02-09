@@ -11,7 +11,7 @@
       </group>
       <group>
         <datetime :min-year="1900" v-model="userInfo.birthday" @on-change="birthdayChange" title="出生日期"
-                  placeholder="请选择出生日期" :readonly="!formType"></datetime>
+                  placeholder="请选择出生日期" :readonly="!formType" :end-date="qudate"></datetime>
       </group>
       <group>
         <popup-picker title="患者性别" :data='gender' v-model='sex' @on-change='genderChange'
@@ -35,7 +35,7 @@
       </group>
       <group>
         <datetime v-model="userInfo.wantTime" @on-change="AppTimeChange" title="期望预约时间"
-                  placeholder="请选择期望预约时间" :readonly="!formType"></datetime>
+                  placeholder="请选择期望预约时间" :readonly="!formType" :start-date="qudate"></datetime>
       </group>
       <group>
         <popup-picker title="预约医院" :data='hostlist' v-model='host' @on-change='hostChange'
@@ -64,7 +64,7 @@
 
 <script type='text/ecmascript-6'>
   import Vue from 'vue'
-  import {XInput, Group, Datetime, PopupPicker, XTextarea, AlertPlugin, LoadingPlugin} from 'vux'
+  import {XInput, Group, Datetime, PopupPicker, XTextarea, AlertPlugin, LoadingPlugin, dateFormat} from 'vux'
   import axios from 'axios'
 
   Vue.use(AlertPlugin)
@@ -129,8 +129,11 @@
           wanthospital: '',
           description: ''
         },
-        imgSrcList: []
+        imgSrcList: [],
+        qudate: dateFormat(new Date(), 'YYYY-MM-DD')
       }
+    },
+    created() {
     },
     methods: {
       telBlur(val, $event) {
