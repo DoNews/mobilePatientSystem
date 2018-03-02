@@ -6,8 +6,7 @@
     </div>
     <div class="wrapper">
       <group>
-        <x-input required title="患者姓名" placeholder="请输入患者姓名" text-align="right" v-model="userInfo.name"
-                 :readonly="!formType"></x-input>
+        <x-input required title="患者姓名" placeholder="请输入患者姓名" text-align="right" v-model="userInfo.name" :readonly="!formType"></x-input>
       </group>
       <group>
         <datetime :min-year="1900" v-model="userInfo.birthday" @on-change="birthdayChange" title="出生日期"
@@ -26,10 +25,9 @@
                  :readonly="!formType" @on-blur="telBlur"></x-input>
       </group>
       <group>
-        <popup-picker title="所属区域" :data='arealist' v-model='area' @on-change='areaChange'
-                      placeholder="请选择所属区域" v-if="formType"></popup-picker>
+        <popup-picker title="居住地" :data='arealist' v-model='area' @on-change='areaChange' placeholder="请选择居住地" v-if="formType"></popup-picker>
         <div class="option" v-if="!formType">
-          <div class="option-name">所属区域</div>
+          <div class="option-name">居住地</div>
           <div class="context">{{userInfo.area}}</div>
         </div>
       </group>
@@ -38,17 +36,22 @@
                   placeholder="请选择期望预约时间" :readonly="!formType" :start-date="qudate"></datetime>
       </group>
       <group>
-        <popup-picker title="预约医院" :data='hostlist' v-model='host' @on-change='hostChange'
-                      placeholder="请选择预约医院" v-if="formType"></popup-picker>
+        <popup-picker title="期望预约医院" :data='hostlist' v-model='host' @on-change='hostChange'
+                      placeholder="请选择预约医院" v-if="formType" ></popup-picker>
         <div class="option" v-if="!formType">
-          <div class="option-name">预约医院</div>
+          <div class="option-name">期望预约医院</div>
           <div class="context">{{userInfo.wanthospital}}</div>
         </div>
       </group>
+       <group>
+       <popup-picker :title="title4" :data="list3" :columns="2" v-model="value4" ref="picker3" @on-change='hospChange' show-name></popup-picker>
+     
+    </group>
       <group title="胎记治疗及胎记描述">
         <x-textarea placeholder="请输入具体描述" v-model="userInfo.description" :height="130"
                     :readonly="!formType"></x-textarea>
       </group>
+      
       <group :title="uploadImgTitle">
         <div class="imgItem" v-show="imgSrcList.length>0" v-for="(imgSrc,index) in imgSrcList" :key="index"
              :style="bgStyle(imgSrc)">
@@ -64,7 +67,7 @@
 
 <script type='text/ecmascript-6'>
   import Vue from 'vue'
-  import {XInput, Group, Datetime, PopupPicker, XTextarea, AlertPlugin, LoadingPlugin, dateFormat} from 'vux'
+  import {XAddress, XInput, Group, Datetime, PopupPicker, XTextarea, AlertPlugin, LoadingPlugin, dateFormat} from 'vux'
   import axios from 'axios'
 
   Vue.use(AlertPlugin)
@@ -104,18 +107,10 @@
     },
     data() {
       return {
+        addressData: [],
+        value4: [],
+        title4: '期望预约医院',
         gender: [['男', '女']],
-        // arealist: [['上海', '北京']],
-        // hostlist: [['上海中山医院', '协和医院']],
-        /* userInfo: {
-          name: '',
-          birthday: '2017-12-11',
-          gender: ['男'],
-          telephone: '',
-          area: ['北京'],
-          app_time: '2017-12-21',
-          host: ['上海中山医院']
-        }, */
         sex: [],
         area: [],
         host: [],
@@ -130,7 +125,8 @@
           description: ''
         },
         imgSrcList: [],
-        qudate: dateFormat(new Date(), 'YYYY-MM-DD')
+        qudate: dateFormat(new Date(), 'YYYY-MM-DD'),
+        list3: [{ name: '中国', value: 'china', parent: 0 }, { name: '美国', value: 'USA', parent: 0 }, {name: '广东', value: 'china001', parent: 'china'}, { name: '美国001', value: 'usa001', parent: 'USA' }]
       }
     },
     created() {
@@ -143,6 +139,10 @@
       },
       genderChange() {
         this.userInfo.sex = this.sex[0]
+      },
+      hospChange() {
+        this.userInfo.wanthospital = this.$refs.picker3.getNameValues()
+        console.log(this.$refs.picker3.getNameValues())
       },
       areaChange() {
         // 提交的时候 要ID
@@ -216,6 +216,7 @@
       }
     },
     components: {
+      XAddress,
       XInput,
       Group,
       Datetime,
