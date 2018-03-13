@@ -35,3 +35,9 @@ export function submitSendCode(params) {
 export function checkTelAndName(params) {
   return get('/api/apoint/checkphone/', params)
 }
+export function getMoreInfo(params) {
+  return get('/api/apoint/lookcheat/', params)
+}
+export function getMatchList(params) {
+  return get('/api/apoint/patsearch/', params)
+}

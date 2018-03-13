@@ -2,6 +2,13 @@
   <div class="wrapper">
     <my-title title="我的患者"></my-title>
     <white-line></white-line>
+    <div class="box">
+      <search placeholder="搜索"
+                position="absolute"
+                v-model="name"
+                auto-scroll-to-top top="50px"
+                @on-change="getMore"></search>
+    </div>
     <div class="list" v-if="patientList.length">
       <patient v-for="(item,index) in patientList"
                :key="index"
@@ -13,15 +20,14 @@
     <no-result v-if="!patientList.length"></no-result>
   </div>
 </template>
-
 <script type='text/ecmascript-6'>
   import Vue from 'vue'
-  import {AlertPlugin} from 'vux' // 引用vux使用单引号
+  import {AlertPlugin, Search} from 'vux' // 引用vux使用单引号
   import MyTitle from 'components/title/title'
   import WhiteLine from 'components/Line/Line'
   import Patient from 'components/patient/patient'
   import NoResult from 'components/no-result/no-result'
-  import {getPatientList} from 'common/service/server'
+  import {getPatientList, getMatchList} from 'common/service/server'
   import {urlSearch} from 'common/js/util'
   import {hideMenus} from 'common/js/mixin'
 
@@ -30,7 +36,8 @@
     mixins: [hideMenus],
     data() {
       return {
-        patientList: []
+        patientList: [],
+        name: this.name
       }
     },
     created() {
@@ -56,6 +63,21 @@
           }
         })
       },
+      getMore() {
+        let params = {
+          openid: localStorage.getItem('openid'),
+          name: this.name
+        }
+        getMatchList(params).then(rsp => {
+          if (rsp.data.ret === 0) {
+            this.patientList = rsp.data.lister
+          } else {
+            this.$vux.alert.show({
+              content: '请检查输入的文字'
+            })
+          }
+        })
+      },
       editorPatient(patient) {
         window.location.href = `./PatientTreat.html?id=${patient.id}`
       },
@@ -67,15 +89,18 @@
       MyTitle,
       WhiteLine,
       Patient,
-      NoResult
+      NoResult,
+      Search
     }
   }
 </script>
-
 <style lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/index.styl"
-
   html, body
     height 100%
     background-color #eef5f5
+    .weui-search-bar__cancel-btn
+      color #6f778c
+    .box
+      height 50px
 </style>

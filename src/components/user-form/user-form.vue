@@ -35,21 +35,12 @@
         <datetime v-model="userInfo.wantTime" @on-change="AppTimeChange" title="期望预约时间"
                   placeholder="请选择期望预约时间" :readonly="!formType" :start-date="qudate"></datetime>
       </group>
-      <group>
-        <popup-picker title="期望预约医院" :data='hostlist' v-model='host' @on-change='hostChange'
-                      placeholder="请选择预约医院" v-if="formType" ></popup-picker>
-        <div class="option" v-if="!formType">
-          <div class="option-name">期望预约医院</div>
-          <div class="context">{{userInfo.wanthospital}}</div>
-        </div>
-      </group>
        <group>
        <popup-picker :title="title4" :data="list3" :columns="2" v-model="value4" ref="picker3" @on-change='hospChange' show-name></popup-picker>
      
     </group>
       <group title="胎记治疗及胎记描述">
-        <x-textarea placeholder="请输入具体描述" v-model="userInfo.description" :height="130"
-                    :readonly="!formType"></x-textarea>
+        <x-textarea placeholder="请输入具体描述" v-model="userInfo.description" :height="130":readonly="!formType"></x-textarea>
       </group>
       
       <group :title="uploadImgTitle">
@@ -69,7 +60,6 @@
   import Vue from 'vue'
   import {XAddress, XInput, Group, Datetime, PopupPicker, XTextarea, AlertPlugin, LoadingPlugin, dateFormat} from 'vux'
   import axios from 'axios'
-
   Vue.use(AlertPlugin)
   Vue.use(LoadingPlugin)
   export default {
@@ -98,7 +88,7 @@
           return []
         }
       },
-      hostlist: {
+      list3: {
         type: Array,
         default: () => {
           return []
@@ -107,7 +97,6 @@
     },
     data() {
       return {
-        addressData: [],
         value4: [],
         title4: '期望预约医院',
         gender: [['男', '女']],
@@ -125,8 +114,7 @@
           description: ''
         },
         imgSrcList: [],
-        qudate: dateFormat(new Date(), 'YYYY-MM-DD'),
-        list3: [{ name: '中国', value: 'china', parent: 0 }, { name: '美国', value: 'USA', parent: 0 }, {name: '广东', value: 'china001', parent: 'china'}, { name: '美国001', value: 'usa001', parent: 'USA' }]
+        qudate: dateFormat(new Date(), 'YYYY-MM-DD')
       }
     },
     created() {
@@ -141,8 +129,8 @@
         this.userInfo.sex = this.sex[0]
       },
       hospChange() {
-        this.userInfo.wanthospital = this.$refs.picker3.getNameValues()
-        console.log(this.$refs.picker3.getNameValues())
+        this.userInfo.wanthospital = this.value4[1]
+//        console.log(this.value4[1])
       },
       areaChange() {
         // 提交的时候 要ID
@@ -151,11 +139,6 @@
       },
       AppTimeChange() {
         // console.log(this.userInfo.wantTime)
-      },
-      hostChange() {
-        // 提交的时候 要ID
-        let aIndex = this.findId(this.hostlist, this.host[0])
-        this.userInfo.wanthospital = this.hostlist[0][aIndex].id
       },
       findId(arr, el) {
         return arr[0].findIndex((item) => {
@@ -174,7 +157,6 @@
         if (!fileDoc) {
           return false
         }
-        // console.log(fileDoc)
         let size = Math.floor(fileDoc.size / 1024)
         if (size > 20000) {
           this.$vux.alert.show({
@@ -183,12 +165,11 @@
           return false
         }
         let formData = new FormData()
-        formData.append('img', fileDoc)
+        formData.append('file', fileDoc)
         this.$vux.loading.show({
           text: '上传中...'
         })
         axios.post('/api/apoint/upload/', formData).then((rsp) => {
-          // console.log(rsp)
           this.$vux.loading.hide()
           if (rsp.data.result === 0) {
             this.imgSrcList.push(rsp.data.imgurl)
@@ -225,7 +206,6 @@
     }
   }
 </script>
-
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   .form-wrapper
     padding 0 18px 10px

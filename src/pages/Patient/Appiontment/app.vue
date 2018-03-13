@@ -6,6 +6,7 @@
                :formType="formType"
                :arealist="arealist"
                :hostlist="hostlist"
+               :list3="hostlist"
                @userInfo="getUserInfo"
                @telandname="telcheck"
                ref="userForm"
@@ -15,7 +16,6 @@
     </div>
   </div>
 </template>
-
 <script type='text/ecmascript-6'>
   import Vue from 'vue'
   import {AlertPlugin} from 'vux' // 引用vux使用单引号
@@ -25,7 +25,6 @@
   import {getProvinceList, getHospitalList, submitAppiont, checkTelAndName} from 'common/service/server'
   import {urlSearch} from 'common/js/util'
   import {checkForm, hideMenus} from 'common/js/mixin'
-
   Vue.use(AlertPlugin)
   export default {
     mixins: [checkForm, hideMenus],
@@ -35,13 +34,17 @@
         formTitle: '预约信息提交（必填）',
         arealist: [],
         hostlist: [],
+        list3: [],
         userInfo: {},
-        photo: []
+        photo: [],
+        openid: ''
       }
     },
     created() {
       let request = urlSearch(window.location.href)
-      if (request.openid) {
+      console.log(request.openid)
+      this.openid = request.openid
+      if (this.openid) {
         localStorage.setItem('openid', request.openid)
       }
       this.getProvinceList()
@@ -58,8 +61,10 @@
           return false
         }
         let params = {
-          phone: tel
+          phone: tel,
+          openid: this.openid
         }
+        console.log(params)
         checkTelAndName(params).then(rsp => {
           // console.log(rsp)
           if (rsp.data.ret !== 0) {
@@ -119,7 +124,8 @@
         getHospitalList().then(rsp => {
           // console.log(rsp)
           if (rsp.data.ret === 0) {
-            this.hostlist = rsp.data.lister
+            this.hostlist = rsp.data.lister[0]
+            console.log(this.hostlist)
           }
         })
       }

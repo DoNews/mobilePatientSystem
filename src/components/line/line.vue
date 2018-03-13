@@ -1,7 +1,6 @@
 <template>
   <div class="line" :style="lineStyle"></div>
 </template>
-
 <script type='text/ecmascript-6'>
   export default {
     props: {
@@ -17,7 +16,6 @@
     }
   }
 </script>
-
 <style lang="stylus" rel="stylesheet/stylus" scoped>
   .line
     background-color #eef5f5
