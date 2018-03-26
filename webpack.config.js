@@ -171,13 +171,13 @@ var config = {
     noInfo: false,
     proxy: {
       '/api': {
-        target: 'http://order.yuemia.com',
+        target: 'http://yuyue.tianshizhiwen.org',
         changeOrigin: true,
         secure: false
         // pathRewrite: {'^/api': ''}
       },
       '/static': {
-        target: 'http://order.yuemia.com',
+        target: 'http://yuyue.tianshizhiwen.org',
         changeOrigin: true,
         // secure: false
         // pathRewrite: {'^/api': ''}

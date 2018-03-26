@@ -29,6 +29,12 @@ export const checkForm = {
       }
       return true
     }
+    // _checkCodeEmpty(obj) {
+    //   let objLen = obj.length()
+    //   if (objLen == 0) {
+    //     return false
+    //   }
+    // }
   }
 }
 

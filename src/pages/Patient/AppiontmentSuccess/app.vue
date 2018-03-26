@@ -8,18 +8,20 @@
       <div class="bottom">客服人员将尽快与您电话确认，请注意接听</div>
     </div>
     <div class="button">
-      <div class="diary" @click="goToPage('diary')">去访问战斗日记</div>
+      <div class="diary" @click="goToPage('myPage')">查看我的预约</div>
       <div class="article" @click="goToPage('article')">查看精彩文章</div>
     </div>
   </div>
 </template>
-
 <script type='text/ecmascript-6'>
-  export default {
+  export default
+  {
     methods: {
       goToPage(arg) {
-        if (arg === 'diary') {
-          // window.location.href = ''
+        if (arg === 'myPage') {
+          if (localStorage.getItem('openid')) {
+            window.location.href = '../Saler/MyReservation.html'
+          }
         } else if (arg === 'article') {
           // window.location.href = ''
         }

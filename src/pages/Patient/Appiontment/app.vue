@@ -6,6 +6,7 @@
                :formType="formType"
                :arealist="arealist"
                :hostlist="hostlist"
+               :userInfo="userInfo"
                :list3="hostlist"
                @userInfo="getUserInfo"
                @telandname="telcheck"
@@ -37,23 +38,30 @@
         list3: [],
         userInfo: {},
         photo: [],
+        codes: '',
         openid: ''
       }
     },
+    mounted() {
+    },
     created() {
+       // (ua.match(/MicroMessenger/i) === 'micromessenger')
       let request = urlSearch(window.location.href)
-      console.log(request.openid)
       this.openid = request.openid
+      // let ua = navigator.userAgent.toLowerCase()
       if (this.openid) {
         localStorage.setItem('openid', request.openid)
+        window.location.href = '/static/MobileClient/Patient/Appiontment.html'
+      } else if (localStorage.getItem('openid')) {
+        this.openid = localStorage.getItem('openid')
+      } else {
+        window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxcf86e59e9c228363&redirect_uri=http%3A%2F%2Fwx.yuemia.com%2Fwechat%2Fopenid.ashx%3Fwx%3Dfindangel%26type%3D1%26Url%3Dhttp%253A%252F%252Fyuyue.tianshizhiwen.org%252FcheckUser&response_type=code&scope=snsapi_base&state=O#wechat_redirect'
       }
       this.getProvinceList()
       this.getHospitalList()
     },
     methods: {
       telcheck(tel, name) {
-        // console.log(tel)
-        // console.log(name)
         if (!this.checkTel(tel)) {
           this.$vux.alert.show({
             content: '请填写正确的手机号码!'
@@ -64,7 +72,6 @@
           phone: tel,
           openid: this.openid
         }
-        console.log(params)
         checkTelAndName(params).then(rsp => {
           // console.log(rsp)
           if (rsp.data.ret !== 0) {
@@ -76,8 +83,14 @@
       },
       submitApp() {
         this.$refs.userForm.submitInfo()
+        let len = this.codes.length
+        if (len === 0) {
+          this.$vux.alert.show({
+            content: '请输入验证码，再提交!'
+          })
+          return false
+        }
         let userInfoFlag = this._checkEmpty(this.userInfo)
-        // console.log(this.userInfo)
         if (!userInfoFlag) {
           this.$vux.alert.show({
             content: '请填写完整信息，再提交!'
@@ -92,29 +105,34 @@
         }
         let params = {
           userinfo: JSON.stringify(this.userInfo),
-          photo: JSON.stringify(this.photo)
+          photo: JSON.stringify(this.photo),
+          codes: this.codes
         }
+        console.log(localStorage.getItem('openid'))
         submitAppiont(params).then(rsp => {
-          // console.log(rsp)
           if (rsp.data.ret === 0) {
             window.location.href = './AppiontmentSuccess.html'
           } else if (rsp.data.ret === 1) {
             this.$vux.alert.show({
               content: '您有预约正在流程中，无需再次预约!'
             })
+          } else if (rsp.data.ret === 2) {
+            this.$vux.alert.show({
+              content: '验证码不正确'
+            })
           }
         }).catch(e => {
           console.log(e)
         })
       },
-      getUserInfo(userInfo, photo) {
+      getUserInfo(userInfo, photo, codes) {
         // 子组件的信息和照片的回传
         this.userInfo = userInfo
         this.photo = photo
+        this.codes = codes
       },
       getProvinceList() {
         getProvinceList().then(rsp => {
-          // console.log(rsp)
           if (rsp.data.ret === 0) {
             this.arealist = rsp.data.lister
           }
@@ -122,10 +140,8 @@
       },
       getHospitalList() {
         getHospitalList().then(rsp => {
-          // console.log(rsp)
           if (rsp.data.ret === 0) {
             this.hostlist = rsp.data.lister[0]
-            console.log(this.hostlist)
           }
         })
       }
@@ -143,7 +159,6 @@
   @import "~common/css/initform.styl"
   .appiontment-wrapper
     background-color #f0f5f5
-
   .submit-btn
     width 100%
     height 40px

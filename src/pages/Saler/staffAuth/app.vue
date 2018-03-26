@@ -95,6 +95,11 @@
           this.$vux.toast.text('请完善您的信息', 'middle')
           return
         }
+        // 检查区域空
+        if (!this.checkEmpty(this.userInfo.area)) {
+          this.$vux.toast.text('请输入居住地', 'middle')
+          return
+        }
         // 检格式
         if (!this.checkTel(this.userInfo.phone)) {
           this.$vux.toast.text('请检查手机格式', 'middle')
@@ -155,6 +160,8 @@
       },
       checkEmpty(obj) {
         for (let key in obj) {
+          console('key:', key)
+          console('value:', obj[key])
           if (obj[key] === '' || !obj[key].length) {
             return false
           }

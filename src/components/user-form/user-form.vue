@@ -35,14 +35,24 @@
         <datetime v-model="userInfo.wantTime" @on-change="AppTimeChange" title="期望预约时间"
                   placeholder="请选择期望预约时间" :readonly="!formType" :start-date="qudate"></datetime>
       </group>
-       <group>
+     <group v-show="showchoose">
        <popup-picker :title="title4" :data="list3" :columns="2" v-model="value4" ref="picker3" @on-change='hospChange' show-name></popup-picker>
-     
     </group>
+    <group  v-show="!showchoose">
+          <div class="option" v-if="!formType">
+          <div class="option-name">期望预约医院</div>
+          <div class="context">{{userInfo.wanthospital}}</div>
+        </div>
+      </group>
+      <group v-show="codeshow">
+        <x-input title="发送验证码" class="weui-vcode" text-align="right" v-model="codes">
+          <x-button v-show="show" slot="right" type="primary" mini background-color="#5bbfd3"  @click.native= "getAuthCode">获取验证码</x-button>
+          <x-button v-show="!show" slot="right" type="default" disabled mini background-color="#ccc">{{count}}s</x-button>
+        </x-input>
+      </group>
       <group title="胎记治疗及胎记描述">
         <x-textarea placeholder="请输入具体描述" v-model="userInfo.description" :height="130":readonly="!formType"></x-textarea>
       </group>
-      
       <group :title="uploadImgTitle">
         <div class="imgItem" v-show="imgSrcList.length>0" v-for="(imgSrc,index) in imgSrcList" :key="index"
              :style="bgStyle(imgSrc)">
@@ -55,10 +65,10 @@
     </div>
   </div>
 </template>
-
 <script type='text/ecmascript-6'>
   import Vue from 'vue'
-  import {XAddress, XInput, Group, Datetime, PopupPicker, XTextarea, AlertPlugin, LoadingPlugin, dateFormat} from 'vux'
+  import qs from 'qs'
+  import {XAddress, XInput, XButton, Group, Datetime, PopupPicker, XTextarea, AlertPlugin, LoadingPlugin, dateFormat} from 'vux'
   import axios from 'axios'
   Vue.use(AlertPlugin)
   Vue.use(LoadingPlugin)
@@ -93,10 +103,27 @@
         default: () => {
           return []
         }
+      },
+      userInfo: {
+        type: Object,
+        default: () => {
+          return {}
+        }
+      },
+      codeshow: {
+        type: Boolean,
+        default: true
+      },
+      showchoose: {
+        type: Boolean,
+        default: true
       }
     },
     data() {
       return {
+        show: true,
+        count: '',
+        timer: null,
         value4: [],
         title4: '期望预约医院',
         gender: [['男', '女']],
@@ -113,6 +140,7 @@
           wanthospital: '',
           description: ''
         },
+        codes: '',
         imgSrcList: [],
         qudate: dateFormat(new Date(), 'YYYY-MM-DD')
       }
@@ -130,7 +158,6 @@
       },
       hospChange() {
         this.userInfo.wanthospital = this.value4[1]
-//        console.log(this.value4[1])
       },
       areaChange() {
         // 提交的时候 要ID
@@ -185,15 +212,59 @@
       delOne(index) {
         this.imgSrcList.splice(index, 1)
       },
+      getAuthCode() {
+        let pramas = {
+          phone: this.userInfo.phone
+        }
+        axios.post('/api/apoint/hairsms/', qs.stringify(pramas)).then((rsp) => {
+          this.$vux.loading.hide()
+          if (rsp.data.result === 0) {
+            this.$vux.alert.show({
+              content: '请注意查收验证码'
+            })
+          } else {
+            this.$vux.alert.show({
+              content: '获取验证码失败，请重试'
+            })
+          }
+        }).catch(e => {
+          console.log(e)
+          this.$vux.alert.show({
+            content: '请输入手机号'
+          })
+        })
+        const TIME_COUNT = 120
+        if (!this.timer) {
+          this.count = TIME_COUNT
+          this.show = false
+          this.timer = setInterval(() => {
+            if (this.count > 0 && this.count <= TIME_COUNT) {
+              this.count--
+            } else {
+              this.show = true
+              clearInterval(this.timer)
+              this.timer = null
+            }
+          }, 1000)
+        }
+      },
       submitInfo() {
+        console.log(this.userInfo, this.codes)
+        if (!this.userInfo.area) {
+          this.$vux.alert.show({
+            content: '请填写居住地'
+          })
+          return
+        }
         this.userInfo.openid = localStorage.getItem('openid') !== 'undefined' ? localStorage.getItem('openid') : ''
-        this.$emit('userInfo', this.userInfo, this.imgSrcList)
+        this.$emit('userInfo', this.userInfo, this.imgSrcList, this.codes)
       }
     },
     watch: {
       info() {
         this.userInfo = this.info
         this.imgSrcList = this.info.photo
+        this.codes = this.info.codes
       }
     },
     components: {
@@ -202,11 +273,16 @@
       Group,
       Datetime,
       PopupPicker,
-      XTextarea
+      XTextarea,
+      XButton
     }
   }
 </script>
 <style lang="stylus" rel="stylesheet/stylus" scoped>
+  .weui-btn + .weui-btn
+    margin 0
+  .weui-btn_primary
+    background: #5bbfd3
   .form-wrapper
     padding 0 18px 10px
     background-color #ffffff
@@ -229,8 +305,8 @@
         display flex
         padding 10px 0
         .option-name
-          flex 0 0 5em
-          width 5em
+          flex 0 0 6em
+          width 6em
         .context
           flex 1
           text-align right

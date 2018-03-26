@@ -7,6 +7,8 @@
                :uploadImgTitle="uploadImgTitle"
                :formType="formType"
                :info="info"
+               :codeshow="false"
+               :showchoose="false"
     ></user-form>
     <div class="desclist">
       <div class="descTitle">客服电话确认记录</div>
@@ -107,7 +109,6 @@
   @import "~common/css/initform.styl"
   .patient-info
     background-color #eef5f5
-
   .desclist
     padding 10px 18px
     background-color #ffffff
